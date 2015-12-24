@@ -2,6 +2,8 @@ package org.chris.cattom.server;
 
 import java.io.IOException;
 
+import org.chris.cattom.servlet.CatRequest;
+import org.chris.cattom.servlet.CatResponse;
 import org.chris.cattom.util.Util;
 
 public class StaticResourceProcessor {
@@ -10,7 +12,7 @@ public class StaticResourceProcessor {
 	 * @param request
 	 * @param response
 	 */
-	public void process(HttpCatRequest request, HttpCatResponse response) {
+	public void process(CatRequest request, CatResponse response) {
 		try {
 			response.sendStaticResource();
 		} catch (IOException e) {
