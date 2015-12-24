@@ -5,12 +5,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLStreamHandler;
-
-import org.chris.cattom.server.CatServer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Util {
 	/**
@@ -84,5 +81,16 @@ public class Util {
 		} catch (IOException e) {
 			System.out.println(Util.exceptionMessage(e));
 		};
+	}
+	
+	public static void main(String[] args) {
+		Map map = new HashMap();
+		map.put(1, 1);
+		map.put(2,2);
+		map.put(5, 5);
+		map.put(3, 3);
+		map.put(2,2);
+		System.out.println(map);
+		Collection vs = map.values();
 	}
 }

@@ -12,10 +12,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.chris.cattom.servlet.CatRequest;
 import org.chris.cattom.servlet.CatResponse;
 import org.chris.cattom.util.Util;
 public class CatServer {
+	private static Logger log = Logger.getLogger(CatServer.class);
 	private static final String SHUTDOWN_COMMAND = "/SHUTDOWN";
 	private boolean shutdown = false;
 	private Map<Object, Object> cache ;
@@ -25,13 +27,20 @@ public class CatServer {
 	}
 	private void loadRepository(){
 		File classPath = new File(Contants.WEB_APP_ROOT);
+		boolean mkdirSuccess = false;
 		try {
+			if(!classPath.exists()){
+				mkdirSuccess = classPath.mkdir();
+				if(mkdirSuccess){
+					log.info("创建Web容器路径成功！");
+				}
+			}
 			String repository = (new URL("file", null, classPath.getCanonicalPath()+ File.separator)).toString();
 			this.repository = repository;
 		} catch (MalformedURLException e) {
-			System.out.println(Util.exceptionMessage(e));
+			log.info(Util.exceptionMessage(e));
 		} catch (IOException e) {
-			System.out.println(Util.exceptionMessage(e));
+			log.info(Util.exceptionMessage(e));
 		}
 	}
 	/**
@@ -81,7 +90,7 @@ public class CatServer {
 				shutdown = request.getUri().equals(SHUTDOWN_COMMAND);
 			}
 		} catch (Exception e) {
-			System.out.println(Util.exceptionMessage(e));
+			log.info(Util.exceptionMessage(e));
 		}
 	}
 }
