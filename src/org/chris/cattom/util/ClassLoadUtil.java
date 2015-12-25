@@ -6,6 +6,7 @@ import java.net.URLClassLoader;
 import java.net.URLStreamHandler;
 
 import org.chris.cattom.server.CatServer;
+import org.chris.cattom.server.ServerAccessor;
 import org.chris.cattom.servlet.Servlet;
 
 public class ClassLoadUtil {
@@ -39,7 +40,7 @@ public class ClassLoadUtil {
 		URLClassLoader loader = null;
 		URLStreamHandler streamHandler = null;
 		URL[] urls = new URL[1];
-		String repository = CatServer.getServer().getRepository();
+		String repository = ServerAccessor.getServletRepository();
 		try {
 			urls[0] = new URL(null, repository, streamHandler);
 		} catch (MalformedURLException e) {

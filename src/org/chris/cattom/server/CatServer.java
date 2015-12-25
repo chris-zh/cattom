@@ -9,6 +9,8 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLStreamHandler;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,22 +23,62 @@ public class CatServer {
 	private static final String SHUTDOWN_COMMAND = "/SHUTDOWN";
 	private boolean shutdown = false;
 	private Map<Object, Object> cache ;
-	private String repository;//servlet容器库地址
-	public String getRepository() {
-		return repository;
+	private String webRepository;//servlet容器库地址
+	private URLClassLoader classLoader;
+	/**
+	 * 获取Servlet资源库地址
+	 * @return
+	 */
+	protected String getServletRepository() {
+		return webRepository;
 	}
-	private void loadRepository(){
-		File classPath = new File(Contants.WEB_APP_ROOT);
-		boolean mkdirSuccess = false;
+	
+	/**
+	 * 获得类加载器
+	 * 
+	 * @return
+	 */
+	private void getClassLoader() {
+		URLClassLoader loader = null;
+		URLStreamHandler streamHandler = null;
+		URL[] urls = new URL[1];
+		String repository = ServerAccessor.getServletRepository();
 		try {
-			if(!classPath.exists()){
-				mkdirSuccess = classPath.mkdir();
-				if(mkdirSuccess){
-					log.info("创建Web容器路径成功！");
+			urls[0] = new URL(null, repository, streamHandler);
+		} catch (MalformedURLException e) {
+			System.out.println(Util.exceptionMessage(e));
+		}
+		this.classLoader = new URLClassLoader(urls);
+	}
+
+	/**
+	 * 初始化CatsServer
+	 */
+	private void init(){
+		//step1 初始化资源库地址
+		loadRepository();
+		
+		
+		//step2 初始化缓存 --不应该用缓存，catserver应该包含服务器启动所需所有的数据
+		//step3 初始化properties catserver所需静态文件的配置信息
+		//step4 初始化classLoader 
+	}
+	
+	/**
+	 * 初始化资源库地址
+	 */
+	private void loadRepository(){
+		File webappFolder = new File(Contants.WEB_APP_ROOT);
+		boolean createWebappFolder = false;
+		try {
+			if(!webappFolder.exists()){
+				createWebappFolder = webappFolder.mkdir();
+				if(createWebappFolder){
+					log.info("创建Web资源库成功！");
 				}
 			}
-			String repository = (new URL("file", null, classPath.getCanonicalPath()+ File.separator)).toString();
-			this.repository = repository;
+			String repository = (new URL("file", null, webappFolder.getCanonicalPath()+ File.separator)).toString();
+			this.webRepository = repository;
 		} catch (MalformedURLException e) {
 			log.info(Util.exceptionMessage(e));
 		} catch (IOException e) {
