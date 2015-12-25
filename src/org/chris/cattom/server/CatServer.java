@@ -18,58 +18,58 @@ import org.apache.log4j.Logger;
 import org.chris.cattom.servlet.CatRequest;
 import org.chris.cattom.servlet.CatResponse;
 import org.chris.cattom.util.Util;
+/**
+ * 容器主服务器
+ * @author chris.zhang
+ *
+ */
 public class CatServer {
+	private static CatServer server = new CatServer();//初始化单例Server
 	private static Logger log = Logger.getLogger(CatServer.class);
 	private static final String SHUTDOWN_COMMAND = "/SHUTDOWN";
 	private boolean shutdown = false;
-	private Map<Object, Object> cache ;
+	private Cache cache ;
 	private String webRepository;//servlet容器库地址
-	private URLClassLoader classLoader;
+	/**
+	 * 获得Server实例
+	 * @return
+	 */
+	protected static CatServer getServer(){
+		return server;
+	}
+	
+	protected Cache getCache() {
+		return cache;
+	}
+
 	/**
 	 * 获取Servlet资源库地址
 	 * @return
 	 */
-	protected String getServletRepository() {
+	protected String getWebRepository() {
 		return webRepository;
 	}
 	
-	/**
-	 * 获得类加载器
-	 * 
-	 * @return
-	 */
-	private void getClassLoader() {
-		URLClassLoader loader = null;
-		URLStreamHandler streamHandler = null;
-		URL[] urls = new URL[1];
-		String repository = ServerAccessor.getServletRepository();
-		try {
-			urls[0] = new URL(null, repository, streamHandler);
-		} catch (MalformedURLException e) {
-			System.out.println(Util.exceptionMessage(e));
-		}
-		this.classLoader = new URLClassLoader(urls);
-	}
 
 	/**
 	 * 初始化CatsServer
 	 */
 	private void init(){
 		//step1 初始化资源库地址
-		loadRepository();
-		
-		
+		this.webRepository = initRepository();
 		//step2 初始化缓存 --不应该用缓存，catserver应该包含服务器启动所需所有的数据
+		this.cache = Cache.getCache();
 		//step3 初始化properties catserver所需静态文件的配置信息
 		//step4 初始化classLoader 
 	}
 	
 	/**
-	 * 初始化资源库地址
+	 * 初始化资源库
 	 */
-	private void loadRepository(){
+	private String initRepository(){
 		File webappFolder = new File(Contants.WEB_APP_ROOT);
 		boolean createWebappFolder = false;
+		String repository = null;
 		try {
 			if(!webappFolder.exists()){
 				createWebappFolder = webappFolder.mkdir();
@@ -77,28 +77,21 @@ public class CatServer {
 					log.info("创建Web资源库成功！");
 				}
 			}
-			String repository = (new URL("file", null, webappFolder.getCanonicalPath()+ File.separator)).toString();
-			this.webRepository = repository;
+			repository = (new URL("file", null, webappFolder.getCanonicalPath()+ File.separator)).toString();
 		} catch (MalformedURLException e) {
 			log.info(Util.exceptionMessage(e));
 		} catch (IOException e) {
 			log.info(Util.exceptionMessage(e));
 		}
-	}
-	/**
-	 * Servler初始化方法
-	 */
-	public CatServer(){
-		this.cache = new HashMap<Object, Object>();
-		loadRepository();//加载资源库
+		return repository;
 	}
 	
-	private static CatServer server = new CatServer();
-	public static CatServer getServer(){
-		return server;
-	}
-	public Map<Object, Object> getCache(){
-		return this.cache;
+	/**
+	 * Server初始化方法
+	 */
+	private CatServer(){
+//		this.cache = Cache.getCache();
+//		loadRepository();//加载资源库
 	}
 	
 	public void await(){

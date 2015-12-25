@@ -1,7 +1,6 @@
 package org.chris.cattom.server;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.chris.cattom.servlet.CatRequest;
 import org.chris.cattom.servlet.CatResponse;
@@ -17,12 +16,16 @@ public class ServletProcessor {
 	 * @param response
 	 */
 	public void process(CatRequest request, CatResponse response) {
-		Map<Object, Object> cache = CatServer.getServer().getCache();
+//		Map<Object, Object> cache = CatServer.getServer().getCache();
+		Cache cache = ServerAccessor.getServerCache();
 		String uri = request.getUri();
 		String servletName = uri.substring(uri.lastIndexOf("/") + 1);
 		Servlet servlet = null;
 		try {
-			servlet = (Servlet) cache.get(servletName);
+			Object servletObject = cache.get(servletName);
+			if(servletObject!=null){
+				servlet = (Servlet) servletObject;
+			}
 			if (servlet == null) {
 				servlet = ClassLoadUtil.loadAndInitServlet(servletName);
 			}

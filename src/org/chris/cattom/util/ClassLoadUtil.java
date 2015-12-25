@@ -20,7 +20,7 @@ public class ClassLoadUtil {
 		try {
 			Class<?> clazz = loader.loadClass(servletName);
 			newServlet = (Servlet) clazz.newInstance();
-			CatServer.getServer().getCache().put(servletName, newServlet);
+			ServerAccessor.getServerCache().put(servletName, newServlet);
 			newServlet.init();
 		} catch (InstantiationException e) {
 			System.out.println(Util.exceptionMessage(e));
@@ -40,7 +40,7 @@ public class ClassLoadUtil {
 		URLClassLoader loader = null;
 		URLStreamHandler streamHandler = null;
 		URL[] urls = new URL[1];
-		String repository = ServerAccessor.getServletRepository();
+		String repository = ServerAccessor.getWebRepository();
 		try {
 			urls[0] = new URL(null, repository, streamHandler);
 		} catch (MalformedURLException e) {
